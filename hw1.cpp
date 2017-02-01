@@ -38,7 +38,7 @@
 #define WINDOW_WIDTH  800
 #define WINDOW_HEIGHT 600
 
-#define MAX_PARTICLES 10000
+#define MAX_PARTICLES 100000
 #define GRAVITY 0.15
 #define rnd() (float)rand() /(float)RAND_MAX
 
@@ -94,30 +94,35 @@ int main(void)
 	game.n=0;
 
 	//declare a box shape
+//	game.box[0].width = 100;
+//	game.box[0].height = 10;
+//	game.box[0].center.x = 120 + 5*65;
+//	game.box[0].center.y = 500 - 5*60;
+	
 	game.box[0].width = 100;
 	game.box[0].height = 10;
-	game.box[0].center.x = 120 + 5*65;
-	game.box[0].center.y = 500 - 5*60;
-	
+	game.box[0].center.x = 150;
+	game.box[0].center.y = 500;
+
 	game.box[1].width = 100;
 	game.box[1].height = 10;
-	game.box[1].center.x = 150;
-	game.box[1].center.y = 500;
-
+	game.box[1].center.x = 250;
+	game.box[1].center.y = 425;
+	
 	game.box[2].width = 100;
 	game.box[2].height = 10;
-	game.box[2].center.x = 300;
-	game.box[2].center.y = 450;
+	game.box[2].center.x = 350;
+	game.box[2].center.y = 350;
 	
 	game.box[3].width = 100;
 	game.box[3].height = 10;
 	game.box[3].center.x = 450;
-	game.box[3].center.y = 400;
+	game.box[3].center.y = 275;
 	
 	game.box[4].width = 100;
 	game.box[4].height = 10;
-	game.box[4].center.x = 600;
-	game.box[4].center.y = 350;
+	game.box[4].center.x = 550;
+	game.box[4].center.y = 200;
 
 
 
@@ -259,9 +264,6 @@ int check_keys(XEvent *e, Game *game)
 		    game->bubbler ^= 1;
 		}
 		//You may check other keys here.
-
-
-
 	}
 	return 0;
 }
@@ -275,8 +277,11 @@ void movement(Game *game)
 
 	if (game->bubbler != 0) {
 	    // the bubbler is on
-	    makeParticle(game, game->mouse[0], game->mouse[1]);
+	    for (int i = 0; i < 100; i++) {
+			makeParticle(game, (game->mouse[0] + rand() % ((game->mouse[0]+20) - game->mouse[0])), game->mouse[1]);
+		}
 	}
+	
 	for (int i = 0; i < game->n; i++) {
 		p = &game->particle[i];
 		p->velocity.y -= GRAVITY;
@@ -286,49 +291,15 @@ void movement(Game *game)
 
 	//check for collision with shapes...
 		Shape *s;
-		s = &game->box[0];
-		if (p->s.center.y < s->center.y + s->height && 
-			p->s.center.x >= s->center.x - s->width &&
-			p->s.center.x <= s->center.x + s->width) {
-	    	p->s.center.y = s->center.y + s->height;
-		p->velocity.y = -p->velocity.y * 0.8f;
-	    	p->velocity.x += 0.05f;
-		}
-
-		s = &game->box[1];
-		if (p->s.center.y < s->center.y + s->height && 
-			p->s.center.x >= s->center.x - s->width &&
-			p->s.center.x <= s->center.x + s->width) {
-	    	p->s.center.y = s->center.y + s->height;
-		p->velocity.y = -p->velocity.y * 0.8f;
-	    	p->velocity.x += 0.05f;
-		}
-		
-		s = &game->box[2];
-		if (p->s.center.y < s->center.y + s->height && 
-			p->s.center.x >= s->center.x - s->width &&
-			p->s.center.x <= s->center.x + s->width) {
-	    	p->s.center.y = s->center.y + s->height;
-		p->velocity.y = -p->velocity.y * 0.8f;
-	    	p->velocity.x += 0.05f;
-		}
-
-		s = &game->box[3];
-		if (p->s.center.y < s->center.y + s->height && 
-			p->s.center.x >= s->center.x - s->width &&
-			p->s.center.x <= s->center.x + s->width) {
-	    	p->s.center.y = s->center.y + s->height;
-		p->velocity.y = -p->velocity.y * 0.8f;
-	    	p->velocity.x += 0.05f;
-		}
-		
-		s = &game->box[4];
-		if (p->s.center.y < s->center.y + s->height && 
-			p->s.center.x >= s->center.x - s->width &&
-			p->s.center.x <= s->center.x + s->width) {
-	    	p->s.center.y = s->center.y + s->height;
-		p->velocity.y = -p->velocity.y * 0.8f;
-	    	p->velocity.x += 0.05f;
+		for (int i = 0; i < 5; i++) {
+			s = &game->box[i];
+			if (p->s.center.y < s->center.y + s->height && 
+				p->s.center.x >= s->center.x - s->width &&
+				p->s.center.x <= s->center.x + s->width) {
+					p->s.center.y = s->center.y + s->height;
+					p->velocity.y = -p->velocity.y * 0.6f;
+					p->velocity.x += 0.01f;
+			}
 		}
 
 	//check for off-screen
@@ -420,7 +391,7 @@ void render(Game *game)
 	//draw all particles here
 	for (int i = 0; i < game->n; i++) {
 		glPushMatrix();
-		glColor3ub(150,160,220);
+		glColor3ub(0, 50 + rand() % (120-50),255);
 		Vec *c = &game->particle[i].s.center;
 		w = 2;
 		h = 2;
