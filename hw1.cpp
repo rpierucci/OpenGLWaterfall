@@ -64,6 +64,15 @@ struct Particle {
 	Vec velocity;
 };
 
+struct Circle {
+	Shape s;
+	int radius;
+};
+
+struct Player {
+	Shape s;
+};
+
 struct Game {
 	Shape box[5];
 	Particle particle[MAX_PARTICLES];
@@ -93,37 +102,12 @@ int main(void)
 	Game game;
 	game.n=0;
 
-	//declare a box shape
-//	game.box[0].width = 100;
-//	game.box[0].height = 10;
-//	game.box[0].center.x = 120 + 5*65;
-//	game.box[0].center.y = 500 - 5*60;
-	
-	game.box[0].width = 100;
-	game.box[0].height = 10;
-	game.box[0].center.x = 150;
-	game.box[0].center.y = 500;
-
-	game.box[1].width = 100;
-	game.box[1].height = 10;
-	game.box[1].center.x = 250;
-	game.box[1].center.y = 425;
-	
-	game.box[2].width = 100;
-	game.box[2].height = 10;
-	game.box[2].center.x = 350;
-	game.box[2].center.y = 350;
-	
-	game.box[3].width = 100;
-	game.box[3].height = 10;
-	game.box[3].center.x = 450;
-	game.box[3].center.y = 275;
-	
-	game.box[4].width = 100;
-	game.box[4].height = 10;
-	game.box[4].center.x = 550;
-	game.box[4].center.y = 200;
-
+	for (int i = 0; i < 5; i++) {
+		game.box[i].width = 100;
+		game.box[i].height = 15;
+		game.box[i].center.x = 150 + (i * 100);
+		game.box[i].center.y = 500 - (i * 75);
+	}
 
 
 	//start animation
@@ -278,7 +262,7 @@ void movement(Game *game)
 	if (game->bubbler != 0) {
 	    // the bubbler is on
 	    for (int i = 0; i < 100; i++) {
-			makeParticle(game, (game->mouse[0] + rand() % ((game->mouse[0]+20) - game->mouse[0])), game->mouse[1]);
+			makeParticle(game, (game->mouse[0] + rand() % ((game->mouse[0]+800) - game->mouse[0])), game->mouse[1]);
 		}
 	}
 	
@@ -291,9 +275,9 @@ void movement(Game *game)
 
 	//check for collision with shapes...
 		Shape *s;
-		for (int i = 0; i < 5; i++) {
-			s = &game->box[i];
-			if (p->s.center.y < s->center.y + s->height && 
+		for (int j = 0; j < 5; j++) {
+			s = &game->box[j];
+			if ((p->s.center.y < s->center.y + s->height && p->s.center.y > s->center.y - s->height) &&
 				p->s.center.x >= s->center.x - s->width &&
 				p->s.center.x <= s->center.x + s->width) {
 					p->s.center.y = s->center.y + s->height;
@@ -306,7 +290,7 @@ void movement(Game *game)
 		if (p->s.center.y < 0.0) {
 			std::cout << "off screen" << std::endl;
 			game->particle[i] = game->particle[--game->n-1];
-			}
+		}
 	}
 }
 
@@ -318,75 +302,21 @@ void render(Game *game)
 
 	//draw box
 	Shape *s;
-	glColor3ub(90,140,90);
-	s = &game->box[0];
-	glPushMatrix();
-	glTranslatef(s->center.x, s->center.y, s->center.z);
-	w = s->width;
-	h = s->height;
-	glBegin(GL_QUADS);
-		glVertex2i(-w,-h);
-		glVertex2i(-w, h);
-		glVertex2i( w, h);
-		glVertex2i( w,-h);
-	glEnd();
-	glPopMatrix();	
-
-	glColor3ub(90,140,90);
-	s = &game->box[1];
-	glPushMatrix();
-	glTranslatef(s->center.x, s->center.y, s->center.z);
-	w = s->width;
-	h = s->height;
-	glBegin(GL_QUADS);
-		glVertex2i(-w,-h);
-		glVertex2i(-w, h);
-		glVertex2i( w, h);
-		glVertex2i( w,-h);
-	glEnd();
-	glPopMatrix();
-
-	glColor3ub(90,140,90);
-	s = &game->box[2];
-	glPushMatrix();
-	glTranslatef(s->center.x, s->center.y, s->center.z);
-	w = s->width;
-	h = s->height;
-	glBegin(GL_QUADS);
-		glVertex2i(-w,-h);
-		glVertex2i(-w, h);
-		glVertex2i( w, h);
-		glVertex2i( w,-h);
-	glEnd();
-	glPopMatrix();
-
-	glColor3ub(90,140,90);
-	s = &game->box[3];
-	glPushMatrix();
-	glTranslatef(s->center.x, s->center.y, s->center.z);
-	w = s->width;
-	h = s->height;
-	glBegin(GL_QUADS);
-		glVertex2i(-w,-h);
-		glVertex2i(-w, h);
-		glVertex2i( w, h);
-		glVertex2i( w,-h);
-	glEnd();
-	glPopMatrix();
-	
-	glColor3ub(90,140,90);
-	s = &game->box[4];
-	glPushMatrix();
-	glTranslatef(s->center.x, s->center.y, s->center.z);
-	w = s->width;
-	h = s->height;
-	glBegin(GL_QUADS);
-		glVertex2i(-w,-h);
-		glVertex2i(-w, h);
-		glVertex2i( w, h);
-		glVertex2i( w,-h);
-	glEnd();
-	glPopMatrix();
+	for (int i = 0; i < 5; i ++) {
+		glColor3ub(0,200,255);
+		s = &game->box[i];
+		glPushMatrix();
+		glTranslatef(s->center.x, s->center.y, s->center.z);
+		w = s->width;
+		h = s->height;
+		glBegin(GL_QUADS);
+			glVertex2i(-w,-h);
+			glVertex2i(-w, h);
+			glVertex2i( w, h);
+			glVertex2i( w,-h);
+		glEnd();
+		glPopMatrix();	
+	}
 
 	//draw all particles here
 	for (int i = 0; i < game->n; i++) {
