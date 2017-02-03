@@ -34,6 +34,7 @@
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <GL/glx.h>
+#include "fonts.h"
 
 #define WINDOW_WIDTH  800
 #define WINDOW_HEIGHT 600
@@ -75,6 +76,7 @@ struct Player {
 
 struct Game {
 	Shape box[5];
+	Shape circle;
 	Particle particle[MAX_PARTICLES];
 	int n;
 	int bubbler;
@@ -109,6 +111,7 @@ int main(void)
 		game.box[i].center.y = 500 - (i * 75);
 	}
 
+	//declare circle
 
 	//start animation
 	while (!done) {
@@ -123,6 +126,7 @@ int main(void)
 		glXSwapBuffers(dpy, win);
 	}
 	cleanupXWindows();
+	cleanup_fonts();
 	return 0;
 }
 
@@ -180,6 +184,8 @@ void init_opengl(void)
 	glOrtho(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT, -1, 1);
 	//Set the screen background color
 	glClearColor(0.1, 0.1, 0.1, 1.0);
+	glEnable(GL_TEXTURE_2D);
+	initialize_fonts();
 }
 
 void makeParticle(Game *game, int x, int y)
@@ -200,7 +206,6 @@ void check_mouse(XEvent *e, Game *game)
 {
 	static int savex = 0;
 	static int savey = 0;
-	static int n = 0;
 
 	if (e->type == ButtonRelease) {
 		return;
@@ -262,7 +267,7 @@ void movement(Game *game)
 	if (game->bubbler != 0) {
 	    // the bubbler is on
 	    for (int i = 0; i < 100; i++) {
-			makeParticle(game, (game->mouse[0] + rand() % ((game->mouse[0]+800) - game->mouse[0])), game->mouse[1]);
+			makeParticle(game, (game->mouse[0] + rand() % ((game->mouse[0]+20) - game->mouse[0])), game->mouse[1]);
 		}
 	}
 	
@@ -298,6 +303,7 @@ void render(Game *game)
 {
 	float w, h;
 	glClear(GL_COLOR_BUFFER_BIT);
+	Rect r;
 	//Draw shapes...
 
 	//draw box
@@ -316,6 +322,10 @@ void render(Game *game)
 			glVertex2i( w,-h);
 		glEnd();
 		glPopMatrix();	
+		r.bot = s->center.y - 16;
+		r.left = s->center.x;
+		r.center = s->center.x;
+		ggprint17(&r, 0,    0, "Test");
 	}
 
 	//draw all particles here
@@ -333,6 +343,10 @@ void render(Game *game)
 		glEnd();
 		glPopMatrix();
 	}
+	
+	
+
+
 }
 
 
