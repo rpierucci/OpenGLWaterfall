@@ -65,15 +65,6 @@ struct Particle {
 	Vec velocity;
 };
 
-struct Circle {
-	Shape s;
-	int radius;
-};
-
-struct Player {
-	Shape s;
-};
-
 struct Game {
 	Shape box[5];
 	Shape circle;
@@ -110,6 +101,10 @@ int main(void)
 		game.box[i].center.x = 150 + (i * 100);
 		game.box[i].center.y = 500 - (i * 75);
 	}
+	
+	game.circle.radius = 100;
+	game.circle.center.x = WINDOW_WIDTH;
+	game.circle.center.y = 0;
 
 	//declare circle
 
@@ -290,7 +285,18 @@ void movement(Game *game)
 					p->velocity.x += 0.01f;
 			}
 		}
-
+		
+	//circle
+/*		Shape *c;
+		c = &game->circle;
+		float dist = sqrt((c->center.x - p->s.center.x) * (c->center.x - p->s.center.x) +
+						  (c->center.y - p->s.center.y) * (c->center.y - p->s.center.y));
+		float ang = atan2((p->s.center.y - c->center.y), (p->s.center.x - c->center.x));
+		if (dist < c->radius) {
+			p->s.center.y = dist*sin(ang)-100;
+			p->velocity.y = rnd() * 2 * (sin(ang));
+			p->velocity.x = rnd() * 1.1 * (cos(ang));
+		}*/
 	//check for off-screen
 		if (p->s.center.y < 0.0) {
 			std::cout << "off screen" << std::endl;
@@ -308,6 +314,7 @@ void render(Game *game)
 
 	//draw box
 	Shape *s;
+	char text[5][32] = {{"Requirements"}, {"Design"} , {"Coding"}, {"Testing"}, {"Maintenance"}};
 	for (int i = 0; i < 5; i ++) {
 		glColor3ub(0,200,255);
 		s = &game->box[i];
@@ -325,8 +332,30 @@ void render(Game *game)
 		r.bot = s->center.y - 16;
 		r.left = s->center.x;
 		r.center = s->center.x;
-		ggprint17(&r, 0,    0, "Test");
+		ggprint17(&r, 0, 0, text[i]);
 	}
+	
+	//draw circle
+	Shape *c;
+	c = &game->circle;
+	float x, y, radius;
+	x = c->center.x;
+	y = c->center.y;
+	radius = c->radius;
+	glPushMatrix();
+	glColor3ub(0,50 + rand() % (120-50),255);
+	int t = 25;
+	float tpi = 2.0f * M_PI;
+	glBegin(GL_TRIANGLE_FAN);
+	glVertex2f(x, y);
+	for (int i = 0; i < t; i++){
+		glVertex2f(x + (radius * cos(i * tpi/t)), 
+				   y + (radius * sin(i * tpi/t)));
+	}
+	glEnd();
+	glPopMatrix();
+	
+	
 
 	//draw all particles here
 	for (int i = 0; i < game->n; i++) {
